@@ -1,0 +1,61 @@
+version: '1'
+services:
+  api-server:
+    build: "./apiServer-container"
+    container_name: api-server
+    restart: always
+    ports:
+      - ${API_SERVER_PORT}:${API_SERVER_PORT}
+    environment:
+      - API_SERVER_HOST=${API_SERVER_HOST}
+      - API_SERVER_PORT=${API_SERVER_PORT}
+      - DB_SERVER_HOST=${DB_SERVER_HOST}
+      - DB_SERVER_PORT=${DB_SERVER_PORT}
+    depends_on:
+      - db-server
+  db-server:
+    build: "./dbServer-container"
+    container_name: db-server
+    restart: always
+    ports:
+      - ${DB_SERVER_PORT}:${DB_SERVER_PORT}
+    environment:
+      - DB_SERVER_HOST=${DB_SERVER_HOST}
+      - DB_SERVER_PORT=${DB_SERVER_PORT}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_DBNAME=${POSTGRES_DBNAME}
+      - TOS_HOST=${TOS_HOST}
+      - TOS_PORT=${TOS_PORT}
+      - TOS_PATH=${TOS_PATH}
+    depends_on:
+      - db
+  postgrest:
+    image: postgrest/postgrest
+    ports:
+      - ${POSTGREST_PORT}:3000
+    environment:
+      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DBNAME}
+      PGRST_JWT_SECRET: ${POSTGREST_SECRET}
+    depends_on:
+      - db
+  db:
+    image: postgres:latest
+    container_name: postgres
+    restart: always
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DBNAME}
+
+  web:
+    build: "./web"
+    ports:
+      - ${WEB_PORT}:3000
+    environment:
+      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
+      - NEXT_PUBLIC_API_TOKEN=${NEXT_PUBLIC_API_TOKEN}
