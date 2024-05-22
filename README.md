@@ -12,10 +12,10 @@
 
 ## Start
 ```
-1. $ git clone https://github.com/jinsung-cho/Port-Container-Management-Server.git
+1. $ git clone https://github.com/ketiops/Port-Container-Dashboard.git
 ```
 ```
-2. $ cd Port-Container-Management-Server
+2. $ cd Port-Container-Dashboard
 ```
 ```
 3. $ mv .env-sample .env
